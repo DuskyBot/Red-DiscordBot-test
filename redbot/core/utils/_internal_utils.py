@@ -139,7 +139,7 @@ async def fuzzy_command_search(
     # Check if term is defined as a tag in the Tags cog, excluding it from fuzzy search.
     tags_cog = ctx.bot.get_cog("Tags")
     if tags_cog is not None:
-        tag = await tags_cog._tags.get_tag(ctx.guild, term)
+        tag = tags_cog.get_tag(ctx.guild, term) or tags_cog.get_tag(None, term)
         if tag:
             return None
 
