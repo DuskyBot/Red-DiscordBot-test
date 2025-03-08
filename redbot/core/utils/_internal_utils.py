@@ -196,11 +196,13 @@ async def format_fuzzy_results(
     -------
     Union[str, discord.Embed]
         The formatted results.
-
     """
     if embed is not False and (embed is True or await ctx.embed_requested()):
         lines = []
         for cmd in matched_commands:
+            # Exclude commands belonging to the "Tags" cog
+            if cmd.cog_name and cmd.cog_name in {"Tags"}:
+                continue
             short_doc = cmd.format_shortdoc_for_context(ctx)
             lines.append(f"**{ctx.clean_prefix}{cmd.qualified_name}** {short_doc}")
         return discord.Embed(
@@ -211,6 +213,9 @@ async def format_fuzzy_results(
     else:
         lines = []
         for cmd in matched_commands:
+            # Exclude commands belonging to the "Tags" cog
+            if cmd.cog_name and cmd.cog_name in {"Tags"}:
+                continue
             short_doc = cmd.format_shortdoc_for_context(ctx)
             lines.append(f"{ctx.clean_prefix}{cmd.qualified_name} -- {short_doc}")
         return "Perhaps you wanted one of these? " + box("\n".join(lines), lang="vhdl")
