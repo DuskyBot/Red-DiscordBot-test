@@ -449,10 +449,15 @@ class Command(CogCommandMixin, DPYCommand):
                     return False
 
         if self.parent is None and self.cog is not None:
-            # For top-level commands, we need to check the cog's requires too
-            ret = await self.cog.requires.verify(ctx)
-            if ret is False:
-                return False
+            cog_perm = await self.cog.requires.verify(ctx)
+            cmd_perm = await self.requires.verify(ctx)
+
+            # Grant access if either the cog OR command has an explicit allow
+            if cog_perm is True or cmd_perm is True:
+                return True
+
+            # Deny only if both levels do not explicitly allow
+            return False
 
         try:
             return await self.requires.verify(ctx)
