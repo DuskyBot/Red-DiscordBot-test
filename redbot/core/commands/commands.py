@@ -454,17 +454,18 @@ class Command(CogCommandMixin, DPYCommand):
 
             # Grant access if either the cog OR command has an explicit allow
             if cog_perm is True or cmd_perm is True:
-                return True
+                result = True
+            else:
+                result = False
+        else:
+            # For non-top-level commands, simply use the command's own rules.
+            result = await self.requires.verify(ctx)
 
-            # Deny only if both levels do not explicitly allow
-            return False
+        ctx.command = original_command
+        if not change_permission_state:
+            ctx.permission_state = original_state
 
-        try:
-            return await self.requires.verify(ctx)
-        finally:
-            ctx.command = original_command
-            if not change_permission_state:
-                ctx.permission_state = original_state
+        return result
 
     def is_enabled(self, guild: Optional[discord.abc.Snowflake] = None) -> bool:
         """
